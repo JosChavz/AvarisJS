@@ -16,13 +16,92 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
   email     String   @unique
-  name      String?
+  name      String
   role      Role     @default(USER)
+  meta      UserMeta?
+  budgets   Budget[]
+  banks     Bank[]
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserMeta {
+  id        Int      @id @default(autoincrement())
+  uid       Int      @unique
+  monthlyBudgetId Int @unique
+  monthlyBudget Budget?
+  user      User     @relation(fields: [uid], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Budget {
+  id        Int @id @default(autoincrement())
+  uid       Int
+  owner     User @relation(fields: [uid], references: [id])
+  monthlyBudgetOwner UserMeta @relation(fields: [id], references: [monthlyBudgetId])
+  name      String
+  maxAmount Float
+  fromDate  DateTime
+  toDate    DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bank {
+  id        Int @id @default(autoincrement())
+  uid       Int
+  owner     User @relation(fields: [uid], references: [id])
+  name      String
+  type      BankType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id        Int @id @default(autoincrement())
+  uid       Int
+  bid       Int
+  budgetId  Int
+  monthlyBudgetId Int
+  payer     User @relation(fields: [uid], references: [id])
+  bank      Bank @relation(fields: [bid], references: [id])
+  category  ExpenseCategory?
+  type      TransactionType
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+// Regarding to last review,
+// Bank Type is not necessarily accurate
+// Checkings; Savings; Investment
+// How to improve?
+enum BankType {
+  CREDIT
+  DEBIT
+}
+
+enum ExpenseCategory {
+  DINING
+  ENTERTAINMENT
+  GROCERIES
+  BILLS
+  SHOPPING
+  TRANSPORTATION
+  WORK
+  TRAVEL
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
 }
