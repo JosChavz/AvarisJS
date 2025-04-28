@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
-      - "5430:5432"
+      - ${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}
     networks:
       - app-network
     healthcheck:
@@ -35,7 +35,8 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/${POSTGRES_DB:-appdb}?schema=public
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
     ports:
-      - "3000:3000"
+      - "3000:3000" # main app
+      - "5555:5555" # prisma studio
     volumes:
       - .:/app
       - /app/node_modules
