@@ -23,6 +23,22 @@ services:
       timeout: 5s
       retries: 5
 
+  # Ngrok Server
+  ngrok:
+    image: ngrok/ngrok:latest
+    command:
+      - "http"
+      - "nextjs:3000"
+      - "--domain=moccasin-selected-prawn.ngrok-free.app"
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    networks:
+      - app-network
+    depends_on:
+      - nextjs
+
   # Next.js Application
   nextjs:
     build:
@@ -32,10 +48,13 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/${POSTGRES_DB:-appdb}?schema=public
+      - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - SIGNING_SECRET=${SIGNING_SECRET:-signing-secret}
     ports:
       - "3000:3000"
+      - "3001:3001"
+      - "5555:5555"
     volumes:
       - .:/app
       - /app/node_modules
