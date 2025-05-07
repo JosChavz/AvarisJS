@@ -4,6 +4,8 @@ FROM node:alpine AS base
 FROM base AS deps
 WORKDIR /app
 
+RUN apk add --no-cache python3 py3-pip make gcc g++
+
 # Copy package files
 COPY package.json package-lock.json* ./
 # Install dependencies

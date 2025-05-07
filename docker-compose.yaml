@@ -23,22 +23,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Ngrok Server
-  ngrok:
-    image: ngrok/ngrok:latest
-    command:
-      - "http"
-      - "nextjs:3000"
-      - "--domain=moccasin-selected-prawn.ngrok-free.app"
-    environment:
-      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
-    ports:
-      - "4040:4040"
-    networks:
-      - app-network
-    depends_on:
-      - nextjs
-
   # Next.js Application
   nextjs:
     build:
@@ -50,7 +34,8 @@ services:
       - NODE_ENV=${NODE_ENV:-development}
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
-      - SIGNING_SECRET=${SIGNING_SECRET:-signing-secret}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-some-secret}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
     ports:
       - "3000:3000"
       - "3001:3001"
